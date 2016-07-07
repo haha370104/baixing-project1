@@ -67,5 +67,5 @@ class employee(db.Model):
         dic['authority_level'] = self.authority_level
         dic['address'] = self.address
         dic['manager_ID'] = self.manager_ID
-        dic['entry_date'] = self.entry_date
+        dic['entry_date'] = str(self.entry_date)
         return dic
