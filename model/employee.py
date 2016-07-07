@@ -69,3 +69,6 @@ class employee(db.Model):
         dic['manager_ID'] = self.manager_ID
         dic['entry_date'] = str(self.entry_date)
         return dic
+
+    def change_pwd(self, passwd):
+        self.passwd = hashlib.md5((passwd + self.salt).encode('ascii')).hexdigest()

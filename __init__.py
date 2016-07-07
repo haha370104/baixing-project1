@@ -1,6 +1,7 @@
 from app_config import app, db
 from flask import render_template, request, make_response
 import json
+from sqlalchemy import and_, not_
 import time
 from controller.filter import *
 
@@ -18,7 +19,7 @@ def check_authority():
 
 @app.route('/')
 def index():
-    return '吼啊'
+    return render_template('homepage.html')
 
 
 @app.route('/login/')
@@ -30,7 +31,7 @@ def login():
 def check_login():
     phone_num = request.args['phone']
     password = request.args['password']
-    user = employee.query.filter_by(phone=phone_num).first()
+    user = employee.query.filter(and_(employee.phone == phone_num, not_(employee.delete_flag))).first()
     if user != None and user.check(password):
         dic = user.to_json()
         dic['token'] = user.token
@@ -65,27 +66,30 @@ def add_staff():
     return json.dumps({'result': 'success'})
 
 
-@app.route('/show_staff/')
-def show_staff():
-    staffs = employee.query.filter_by(s_department=request.args['s_department']).all()
-    result = []
-    for staff in staffs:
-        result.append(staff.to_json())
-    return json.dumps({'result': result})
-
-
 @app.route('/show_team_staff/', methods=['GET'])
 def show_team_staff():
-    staffs = employee.query.filter_by(f_department=request.args['f_department']).all()
+    staffs = employee.query.filter(and_(employee.f_department == request.args['f_department'],
+                                        employee.s_department == request.args[
+                                            's_department']), not_(employee.delete_flag)).all()
     result = []
     for staff in staffs:
         result.append(staff.to_json())
     return json.dumps({'result': result})
 
 
-@app.route('/show_department_staff/')
-def show_department_staff():
-    staffs = employee.query.all()
+@app.route('/show_staff/')
+def show_staff():
+    staffs = employee.query.filter(
+        and_(employee.f_department == request.args['f_department'], not_(employee.delete_flag))).all()
+    result = []
+    for staff in staffs:
+        result.append(staff.to_json())
+    return json.dumps({'result': result})
+
+
+@app.route('/show_department_staff/<int:start>/<int:size>/')
+def show_department_staff(start, size):
+    staffs = employee.query.filter_by(delete_flag=False).offset(start - 1).limit(size)
     result = []
     for staff in staffs:
         result.append(staff.to_json())
@@ -98,11 +102,8 @@ def edit_staff():
     if (edited_staff == None):
         return json.dumps({'result': 'No such a staff with posted ID'})
     detail = json.loads(request.args['detail'])
-    attrs = list(detail.keys())
-    values = list(detail.values())
-    for i in range(len(attrs)):
-        setattr(edited_staff, attrs[i], values[i])
-    db.session.add(edited_staff)
+    for key in detail.keys():
+        setattr(edited_staff, key, detail[key])
     db.session.commit()
     return json.dumps({'result': 'update success'})
 
@@ -125,10 +126,12 @@ def edit_profile():
 @app.route('/change_password/', methods=['POST'])
 def change_password():
     user = employee.query.filter_by(ID=request.args['ID']).first()
-    user.paswswd = request.args['password']
-    db.session.delete(user)
-    db.session.commit()
-    return json.dumps({'result': 'change password success'})
+    if user != None:
+        user.change_pwd(request.args['password'])
+        db.session.commit()
+        return json.dumps({'result': 'change password success'})
+    else:
+        return json.dumps({'result': 'No such a staff with posted ID'})
 
 
 @app.route('/logout/')
