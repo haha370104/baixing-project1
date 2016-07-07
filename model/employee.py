@@ -9,7 +9,7 @@ class employee(db.Model):
     __tablename__ = 'employee'
     ID = db.Column('ID', db.Integer, primary_key=True, nullable=False, autoincrement=True)
     employee_name = db.Column('employee_name', db.String(10), nullable=False)
-    phone = db.Column('phone', db.String(11), nullable=False)
+    phone = db.Column('phone', db.String(11), nullable=False, unique=True)
     emergency_phone = db.Column('emergency_phone', db.String(11), default=None)
     f_department = db.Column('f_department', db.String(40), nullable=False)
     s_department = db.Column('s_department', db.String(40), default=None)
