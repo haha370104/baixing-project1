@@ -19,43 +19,44 @@ def check_authority():
 
 @app.route('/')
 def index():
-    return render_template('homepage.html')
+    return render_template('index.html')
 
 
 @app.route('/login/')
 def login():
-    return '江主席,你说先登陆,吼不吼啊'
+    return render_template('login.html')
 
 
 @app.route('/check_login/', methods=['GET', 'POST'])
 def check_login():
-    phone_num = request.args['phone']
-    password = request.args['password']
+    phone_num = request.values['phone']
+    password = request.values['password']
     user = employee.query.filter(and_(employee.phone == phone_num, not_(employee.delete_flag))).first()
     if user != None and user.check(password):
         dic = user.to_json()
         dic['token'] = user.token
         res = make_response(json.dumps(dic))
         res.set_cookie('token', user.token, expires=time.time() + 24 * 60 * 60)
+        res.set_cookie('authority_level', str(user.authority_level), expires=time.time() + 24 * 60 * 60)
         session['token'] = user.token
         return res
     else:
-        return json.dumps({'error_code': 404, 'error_result': '账号不存在或密码错误,请重试'})
+        return json.dumps({'error_code': 404, 'error_reason': '账号不存在或密码错误,请重试'})
 
 
 @app.route('/add_staff/', methods=['GET', 'POST'])
 def add_staff():
     try:
-        name = request.args['name']
-        phone = request.args['phone']
-        f_department = request.args['f_department']
-        position_title = request.args['position_title']
-        authority_level = request.args['authority_level']
-        position_level = request.args['position_level']
-        emergency_phone = request.args.get('emergency_phone')
-        s_department = request.args.get('s_department')
-        address = request.args.get('address')
-        manager_ID = request.args.get('manager_ID')
+        name = request.values['name']
+        phone = request.values['phone']
+        f_department = request.values['f_department']
+        position_title = request.values['position_title']
+        authority_level = request.values['authority_level']
+        position_level = request.values['position_level']
+        emergency_phone = request.values.get('emergency_phone')
+        s_department = request.values.get('s_department')
+        address = request.values.get('address')
+        manager_ID = request.values.get('manager_ID')
         user = employee(name, phone, f_department, position_title, authority_level, position_level, '000000',
                         emergency_phone,
                         s_department, address, manager_ID)
@@ -68,8 +69,8 @@ def add_staff():
 
 @app.route('/show_team_staff/', methods=['GET'])
 def show_team_staff():
-    staffs = employee.query.filter(and_(employee.f_department == request.args['f_department'],
-                                        employee.s_department == request.args[
+    staffs = employee.query.filter(and_(employee.f_department == request.values['f_department'],
+                                        employee.s_department == request.values[
                                             's_department']), not_(employee.delete_flag)).all()
     result = []
     for staff in staffs:
@@ -80,7 +81,7 @@ def show_team_staff():
 @app.route('/show_staff/')
 def show_staff():
     staffs = employee.query.filter(
-        and_(employee.f_department == request.args['f_department'], not_(employee.delete_flag))).all()
+        and_(employee.f_department == request.values['f_department'], not_(employee.delete_flag))).all()
     result = []
     for staff in staffs:
         result.append(staff.to_json())
@@ -98,10 +99,10 @@ def show_department_staff(start, size):
 
 @app.route('/edit_staff/', methods=['POST'])
 def edit_staff():
-    edited_staff = employee.query.filter_by(ID=request.args['ID']).first()
+    edited_staff = employee.query.filter_by(ID=request.values['ID']).first()
     if (edited_staff == None):
         return json.dumps({'result': 'No such a staff with posted ID'})
-    detail = json.loads(request.args['detail'])
+    detail = json.loads(request.values['detail'])
     for key in detail.keys():
         setattr(edited_staff, key, detail[key])
     db.session.commit()
@@ -110,7 +111,7 @@ def edit_staff():
 
 @app.route('/delete_staff/', methods=['POST'])
 def delete_staff():
-    deleted_staff = employee.query.filter_by(ID=request.args['ID']).first()
+    deleted_staff = employee.query.filter_by(ID=request.values['ID']).first()
     if (deleted_staff == None):
         return json.dumps({'result': 'No such a staff with posted ID'})
     deleted_staff.delete()
@@ -125,9 +126,9 @@ def edit_profile():
 
 @app.route('/change_password/', methods=['POST'])
 def change_password():
-    user = employee.query.filter_by(ID=request.args['ID']).first()
+    user = employee.query.filter_by(ID=request.values['ID']).first()
     if user != None:
-        user.change_pwd(request.args['password'])
+        user.change_pwd(request.values['password'])
         db.session.commit()
         return json.dumps({'result': 'change password success'})
     else:

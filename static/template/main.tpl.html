@@ -1,0 +1,30 @@
+
+<div ui-view="main">
+
+    <section class="menu-section">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="navbar-collapse collapse ">
+                        <ul id="menu-top" class="nav navbar-nav navbar-right">
+                            <li><a ui-sref="main.team">Web组</a></li>
+                            <li><a ui-sref="main.department">技术部</a></li>
+                            <li><a ui-sref="main.changePassword">修改密码</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- MENU SECTION END-->
+
+    <div class="content-wrapper">
+        <div ui-view="team"></div>
+        <div ui-view="department"></div>
+        <div ui-view="changePassword"></div>
+        <div ui-view="editProfile"></div>
+        <div ui-view="editStaff"></div>
+    </div>
+    <!-- CONTENT-WRAPPER SECTION END-->
+</div>
+

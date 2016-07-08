@@ -68,6 +68,10 @@ class employee(db.Model):
         dic['address'] = self.address
         dic['manager_ID'] = self.manager_ID
         dic['entry_date'] = str(self.entry_date)
+
+        for key in dic.keys():
+            if dic[key] == None:
+                dic[key] = ''
         return dic
 
     def change_pwd(self, passwd):

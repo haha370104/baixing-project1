@@ -1,0 +1,70 @@
+<div class="content-wrapper">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <h4 class="page-head-line">Web组</h4>
+
+            </div>
+
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <table datatable="" class="table table-hover my-table">
+                    <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>姓名</th>
+                        <th>一级部门</th>
+                        <th>二级部门</th>
+                        <th>岗位名称</th>
+                        <th>职位级别</th>
+                        <th>直属经理</th>
+                        <th>手机</th>
+                        <th>紧急联络人</th>
+                        <th>住址</th>
+                        <th>入职日期</th>
+                        <th>操作</th>
+                    </tr>
+                    </thead>
+                    <tbody id="table">
+                    <tr>
+                        <td>1</td>
+                        <td>神秘人</td>
+                        <td>技术部</td>
+                        <td>Web组</td>
+                        <td>前端工程师</td>
+                        <td>员工</td>
+                        <td>物理哥</td>
+                        <td>1111111111</td>
+                        <td>室友</td>
+                        <td>1</td>
+                        <td>2016-07-04</td>
+                        <td>
+                            <span class="glyphicon glyphicon-pencil my-table-operation-button" aria-hidden="true"
+                                  title="修改"></span>
+                            &nbsp;
+                            <span class="glyphicon glyphicon-remove my-table-operation-button" aria-hidden="true"
+                                  title="删除"></span>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+</div>
+<script src="/static/js/fundational.js"></script>
+<script>
+    $(document).ready(function () {
+        $.get('/show_department_staff/1/20/', function (data, status) {
+            var jsons = JSON.parse(data);
+            jsons = jsons['result'];
+            console.log(jsons);
+            for (var json in jsons) {
+                document.getElementById('table').innerHTML += get_row_html(jsons[0], getCookie('authority_level'));
+            }
+            //alert(3);
+        })
+    });
+</script>

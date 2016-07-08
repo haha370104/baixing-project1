@@ -1,0 +1,29 @@
+.navbar-my-brand {
+    position: relative;
+    top:5px;
+
+    display: block;
+    width: 250px;
+    height: 50px;
+
+    font-family: 华文细黑;
+    font-size: 22px;
+}
+
+.navbar-my-company-name {
+    display: block;
+
+    font-weight: bold;
+    color: white;
+
+}
+
+.navbar-my-system-name {
+    position: relative;
+
+    top:10px;
+    left: 20px;
+    display: block;
+
+    color: white;
+}

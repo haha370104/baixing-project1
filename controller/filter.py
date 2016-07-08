@@ -1,6 +1,6 @@
 from flask import redirect, session, url_for
 from model.employee import employee
-from sqlalchemy import and_,not_
+from sqlalchemy import and_, not_
 import json
 
 
@@ -14,16 +14,9 @@ def get_staff_by_token(request):
 
 
 def login_again_filter(request):
-    token = request.cookies.get('token')
-    if token != None and token == session.get('token'):
+    user = get_staff_by_token(request)
+    if user != None:
         return redirect(url_for('index'))
-    elif token != None:
-        user = employee.query.filter(and_(employee.token == token, not_(employee.delete_flag))).first()
-        if user != None:
-            session['token'] = user.token
-            dic = user.to_json()
-            dic['token'] = user.token
-            return redirect(url_for('index'))
 
 
 def login_filter(request):
